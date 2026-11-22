@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Azara's RNGのポーション素材計算ツール。必要素材や手持ち素材から作れる個数を計算できます。">
+<title>Azara's RNG Potion Calculator</title>
+<style>
+:root{--bg:#0c1020;--panel:#171d34;--panel2:#202844;--line:#34405f;--text:#f4f6ff;--muted:#aab5d2;--accent:#9b7cff;--accent2:#5be4d2;--good:#7ce6ad;--warn:#ffd479;--field-bg:#0e1428;--result-bg:#10172b;--input-bg:#0a1020;--body-glow:#20274a}
+body[data-theme="light"]{--bg:#f3f5fb;--panel:#ffffff;--panel2:#e8ecf6;--line:#cbd3e5;--text:#182039;--muted:#58627b;--accent2:var(--accent);--field-bg:#f8f9fd;--result-bg:#f3f5fb;--input-bg:#fff;--body-glow:#e4e9f7}
+body[data-color="red"]{--accent:#ef4444}body[data-color="orange"]{--accent:#f97316}body[data-color="yellow"]{--accent:#eab308}body[data-color="green"]{--accent:#22c55e}body[data-color="blue"]{--accent:#3b82f6}body[data-color="purple"]{--accent:#9b7cff}body[data-color="mono"]{--accent:#8b95a7}body[data-color="gaming"]{--accent:#ff003c;--accent2:#ff003c}body[data-color="gaming"] .tab.active,body[data-color="gaming"] .btn:not(.secondary){background:#ff003c;border:1px solid #ff003c;color:#fff;animation:gamingHue 0.4s linear infinite}body[data-color="gaming"] .btn:not(.secondary){background-image:none}
+body[data-color="gaming"] .tabs .tab{background-image:linear-gradient(90deg,#ff3030,#ff9500,#ffe600,#65ff00,#00eaff,#286bff,#bd35ff,#ff3030)!important;background-size:300% 100%!important;animation:rainbowText 1.2s linear infinite!important;color:#fff!important;border:1px solid #fff!important;text-shadow:0 1px 2px #000,0 0 3px #000;box-shadow:0 0 10px #ff3030,0 0 22px #bd35ff!important}
+body[data-color="gaming"] #calcNeed,body[data-color="gaming"] #calcCraft{background-image:linear-gradient(90deg,#ff3030,#ff9500,#ffe600,#65ff00,#00eaff,#286bff,#bd35ff,#ff3030)!important;background-size:300% 100%!important;animation:rainbowText 1.2s linear infinite!important;filter:none!important;color:#fff!important;border:1px solid #fff!important;box-shadow:0 0 10px #ff3030,0 0 22px #bd35ff!important}
+body[data-color="gaming"] #colorSelect{color:transparent;background-image:linear-gradient(90deg,#ff3030,#ff9d00,#ffe600,#38d430,#00cfff,#386bff,#b43cff,#ff3030);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;animation:rainbowText 1.2s linear infinite}
+body[data-color="gaming"] .tab.active,body[data-color="gaming"] .btn:not(.secondary){color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+@keyframes rainbowText{to{background-position:300% 0}}body[data-color="gaming"] .eyebrow,body[data-color="gaming"] .langbtn:hover{animation:gamingHue 0.4s linear infinite}@keyframes gamingHue{to{filter:hue-rotate(360deg) saturate(2.5) brightness(2.5)}}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,var(--body-glow) 0,var(--bg) 55%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+.wrap{max-width:1000px;margin:auto;padding:24px 16px 56px}.hero{text-align:center;padding:34px 18px 26px}.eyebrow{color:var(--accent2);font-size:.8rem;font-weight:800;letter-spacing:.18em}.hero h1{font-size:clamp(1.8rem,5vw,3rem);line-height:1.15;margin:12px 0}.hero p{color:var(--muted);margin:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--panel);color:var(--text);font-weight:750;cursor:pointer}.tab.active{background:var(--accent);border-color:var(--accent);color:#100d22}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,26px);margin-bottom:18px;box-shadow:0 12px 35px #0002}.panel h2{margin:0 0 16px;font-size:1.25rem}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.field label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:7px}.field input,.field select,.search{width:100%;border:1px solid var(--line);background:var(--field-bg);color:var(--text);padding:12px;border-radius:10px;font:inherit}.btn{border:0;border-radius:11px;background:var(--accent);color:white;padding:13px 18px;font:inherit;font-weight:800;cursor:pointer;margin-top:16px}.btn.secondary{background:var(--panel2);border:1px solid var(--line)}.result{margin-top:18px}.resultbox{background:var(--result-bg);border:1px solid var(--line);border-radius:13px;padding:16px;margin-top:12px}.resultbox h3{margin:0 0 10px}.muted{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:3px 9px;font-size:.78rem;color:var(--muted);margin:2px}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:.85rem;font-weight:650}td:last-child,th:last-child{text-align:right}.empty{color:var(--muted);padding:12px 0}.hidden{display:none!important}.toggle{display:flex;gap:8px;align-items:center;color:var(--muted);margin-top:14px}.toggle input{accent-color:var(--accent);width:18px;height:18px}.inventory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.invrow{display:grid;grid-template-columns:1fr 115px;align-items:center;gap:10px;background:var(--result-bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.invrow input{width:100%;background:var(--input-bg);color:var(--text);border:1px solid var(--line);padding:9px;border-radius:8px}.note{font-size:.85rem;color:var(--muted);margin-top:12px}.footer{text-align:center;color:var(--muted);font-size:.8rem;padding:12px}.langbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.langbtn{border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);padding:8px 16px;font:inherit;font-weight:750;cursor:pointer}.langbtn:hover{border-color:var(--accent2)}.theme-select{max-width:140px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}.theme-select:focus,.langbtn:focus{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="langbar"><button id="langToggle" class="langbtn" type="button" aria-label="Switch language">English</button><button id="themeToggle" class="langbtn" type="button" data-i18n="themeToggle">ダーク</button><select id="colorSelect" class="theme-select" aria-label="Theme color"><option value="red">赤 / Red</option><option value="orange">オレンジ / Orange</option><option value="yellow">黄 / Yellow</option><option value="green">緑 / Green</option><option value="blue">青 / Blue</option><option value="purple" selected>紫 / Purple</option><option value="mono">白黒 / Monochrome</option><option value="gaming">レインボー / Rainbow</option></select></div>
+<header class="hero">
+<div class="eyebrow">AZARA'S RNG • FAN-MADE TOOL</div>
+<h1>Potion Calculator</h1>
+<p data-i18n="tagline">ポーションの必要素材と、手持ち素材から作れる個数を計算</p>
+</header>
+<div class="tabs" role="tablist">
+<button class="tab active" data-tab="need" data-i18n="tabNeed">必要素材を計算</button>
+<button class="tab" data-tab="craft" data-i18n="tabCraft">作れる個数を計算</button>
+<button class="tab" data-tab="recipes" data-i18n="tabRecipes">レシピ一覧</button>
+</div>
+
+<section id="need" class="panel">
+<h2 data-i18n="needTitle">必要素材を計算</h2>
+<div class="formgrid">
+<div class="field"><label for="needPotion" data-i18n="targetPotion">作りたいポーション</label><select id="needPotion"></select></div>
+<div class="field"><label for="needCount" data-i18n="quantity">作成したい個数</label><input id="needCount" type="number" min="1" step="1" value="1"></div>
+</div>
+<label class="toggle"><input id="expandNeed" type="checkbox" checked><span data-i18n="expandToggle">中間ポーションを元の素材まで分解して表示</span></label>
+<div class="field" style="margin-top:14px"><label data-i18n="ownedPotionLabel">手持ちの中間ポーション（必要なものだけ自動表示）</label><p class="note" data-i18n="ownedPotionNote">持っている数を入力すると、そのポーションを優先して使い、不足分だけ素材に分解します。空欄は0個として扱います。</p><div id="ownedPotionInputs" class="inventory-grid"></div></div>
+<button class="btn" id="calcNeed" data-i18n="calcNeed">必要素材を計算</button>
+<div id="needResult" class="result" aria-live="polite"></div>
+</section>
+
+<section id="craft" class="panel hidden">
+<h2 data-i18n="craftTitle">手持ち素材から作れる個数</h2>
+<div class="formgrid">
+<div class="field"><label for="craftPotion" data-i18n="targetPotion">作りたいポーション</label><select id="craftPotion"></select></div>
+<div class="field"><label for="craftLimit" data-i18n="craftLimit">作成数の上限（任意）</label><input id="craftLimit" type="number" min="1" step="1" placeholder="空欄なら素材から算出" data-i18n-placeholder="craftLimitPlaceholder"></div>
+</div>
+<p class="muted" data-i18n="craftNote">作りたいポーションに必要な素材と中間ポーションが自動表示されます。数を入力した素材だけ所持数の上限として扱い、空欄は「十分にある（無制限）」として計算します。</p>
+<label class="toggle"><input id="includeIntermediate" type="checkbox" checked><span data-i18n="includeIntermediateToggle">中間ポーションの素材も含めて計算</span></label>
+<div id="inventory" class="inventory-grid"></div>
+<button class="btn" id="calcCraft" data-i18n="calcCraft">作れる個数を計算</button>
+<div id="craftResult" class="result" aria-live="polite"></div>
+</section>
+
+<section id="recipes" class="panel hidden">
+<h2 data-i18n="recipesTitle">登録済みレシピ</h2>
+<div class="field"><label for="recipeSearch" data-i18n="searchLabel">ポーション・素材を検索</label><input class="search" id="recipeSearch" placeholder="例：Lucky、Eternity" data-i18n-placeholder="searchPlaceholder"></div>
+<div id="recipeList"></div>
+</section>
+<div class="footer" data-i18n="footer">Fan-made calculator • ゲームの公式ツールではありません</div><div class="footer">Made by NOOB</div>
+</div>
+<script>
+let currentLang='ja';
+let currentTheme='dark';
+const translations={
+ ja:{tagline:'ポーションの必要素材と、手持ち素材から作れる個数を計算',tabNeed:'必要素材を計算',tabCraft:'作れる個数を計算',tabRecipes:'レシピ一覧',needTitle:'必要素材を計算',targetPotion:'作りたいポーション',quantity:'作成したい個数',expandToggle:'中間ポーションを元の素材まで分解して表示',ownedPotionLabel:'手持ちの中間ポーション（必要なものだけ自動表示）',ownedPotionNote:'持っている数を入力すると、そのポーションを優先して使い、不足分だけ素材に分解します。空欄は0個として扱います。',calcNeed:'必要素材を計算',craftTitle:'手持ち素材から作れる個数',craftLimit:'作成数の上限（任意）',craftLimitPlaceholder:'空欄なら素材から算出',craftNote:'作りたいポーションに必要な素材と中間ポーションが自動表示されます。数を入力した素材だけ所持数の上限として扱い、空欄は「十分にある（無制限）」として計算します。',includeIntermediateToggle:'中間ポーションの素材も含めて計算',calcCraft:'作れる個数を計算',recipesTitle:'登録済みレシピ',searchLabel:'ポーション・素材を検索',searchPlaceholder:'例：Lucky、Eternity',footer:'Fan-made calculator • ゲームの公式ツールではありません',themeToggle:'ライト',noIntermediate:'中間ポーションはありません。',potionCol:'中間ポーション',requiredCol:'必要数',ownedUsedCol:'手持ちから使用',choosePotion:'ポーションを選択してください。',expandedMode:'元の素材まで分解',directMode:'レシピ直下の素材',requiredMaterials:'必要素材',intermediateUsage:'使用する中間ポーション',ownedDeductNote:'入力された手持ちポーションを優先して差し引いています。',noMaterials:'必要な素材はありません。',materialsCol:'素材',amountCol:'必要数',noOwnedPotions:'このポーションには素材として使うポーションはありません。',craftable:'作成可能数：',unlimited:'上限なし',units:'個',craftExplain:'入力した所持数を上限として計算し、空欄の素材・ポーションは無制限として扱います。',usedMaterials:'使用する素材・ポーション（1回分',reference:'の参考値',noUsage:'素材の使用はありません。',remaining:'入力した素材の残数（参考）',noEnteredStock:'所持数を入力した素材はありません。',noRecipes:'該当するレシピはありません。',noMaterialsAvailable:'素材がありません。',unlimitedPlaceholder:'無制限',inventoryAria:'の所持数（空欄は無制限）',ownedAria:'の所持数'},
+ en:{tagline:'Calculate potion ingredients and how many you can craft from your inventory',tabNeed:'Required Materials',tabCraft:'Craftable Amount',tabRecipes:'Recipe List',needTitle:'Calculate Required Materials',targetPotion:'Potion to craft',quantity:'Quantity to craft',expandToggle:'Expand intermediate potions into base ingredients',ownedPotionLabel:'Owned intermediate potions (shown automatically)',ownedPotionNote:'Enter how many you own to use them first; only the remaining amount is expanded into ingredients. Blank means 0.',calcNeed:'Calculate Materials',craftTitle:'Craftable Amount from Inventory',craftLimit:'Crafting limit (optional)',craftLimitPlaceholder:'Leave blank to calculate from inventory',craftNote:'Required ingredients and intermediate potions are shown automatically. Entered quantities limit your inventory; blank means unlimited.',includeIntermediateToggle:'Include ingredients of intermediate potions in calculation',calcCraft:'Calculate Craftable Amount',recipesTitle:'Registered Recipes',searchLabel:'Search potions or ingredients',searchPlaceholder:'e.g. Lucky, Eternity',footer:'Fan-made calculator • Not an official game tool',themeToggle:'Light',noIntermediate:'No intermediate potions.',potionCol:'Intermediate Potion',requiredCol:'Required',ownedUsedCol:'Used from inventory',choosePotion:'Please select a potion.',expandedMode:'Expanded to base ingredients',directMode:'Direct recipe ingredients',requiredMaterials:'Required Materials',intermediateUsage:'Intermediate Potions Used',ownedDeductNote:'Owned intermediate potions are deducted first.',noMaterials:'No materials required.',materialsCol:'Ingredient',amountCol:'Required',noOwnedPotions:'This potion does not use other potions as ingredients.',craftable:'Craftable amount: ',unlimited:'Unlimited',units:'',craftExplain:'Entered quantities are treated as inventory limits; blank ingredients and potions are unlimited.',usedMaterials:'Materials and potions used (for 1 craft',reference:' reference',noUsage:'No ingredients used.',remaining:'Remaining entered inventory (reference)',noEnteredStock:'No inventory quantities entered.',noRecipes:'No matching recipes.',noMaterialsAvailable:'No ingredients.',unlimitedPlaceholder:'Unlimited',inventoryAria:' inventory (blank means unlimited)',ownedAria:' owned'},
+};
+function t(key){return translations[currentLang][key]||translations.ja[key]||key;}
+function applyLanguage(){
+ const ownedValues={};document.querySelectorAll('#ownedPotionInputs input[data-owned-potion]').forEach(el=>ownedValues[el.dataset.ownedPotion]=el.value);
+ const inventoryValues={};document.querySelectorAll('#inventory input[data-material]').forEach(el=>inventoryValues[el.dataset.material]=el.value);
+ document.documentElement.lang=currentLang;
+ document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;if(translations[currentLang][key])el.textContent=translations[currentLang][key];});
+ document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(translations[currentLang][key])el.placeholder=translations[currentLang][key];});
+ $('langToggle').textContent=currentLang==='ja'?'English':'日本語';
+ $('langToggle').setAttribute('aria-label',currentLang==='ja'?'Switch to English':'日本語に切り替え');
+ $('themeToggle').textContent=currentTheme==='dark'?(currentLang==='ja'?'ライト':'Light'):(currentLang==='ja'?'ダーク':'Dark');
+ $('themeToggle').setAttribute('aria-label',currentTheme==='dark'?'Switch to light theme':'Switch to dark theme');
+ buildOwnedPotionInputs();buildInventory();
+ document.querySelectorAll('#ownedPotionInputs input[data-owned-potion]').forEach(el=>{if(ownedValues[el.dataset.ownedPotion]!==undefined)el.value=ownedValues[el.dataset.ownedPotion];});
+ document.querySelectorAll('#inventory input[data-material]').forEach(el=>{if(inventoryValues[el.dataset.material]!==undefined)el.value=inventoryValues[el.dataset.material];});
+ renderRecipes($('recipeSearch').value);
+ if($('needResult').innerHTML)calcNeed();
+ if($('craftResult').innerHTML)calcCraft();
+}
+const recipes = {
+ "Lucky Potion":{"Lucky":1,"rare":10},
+ "Fortune Potion":{"Lucky":50,"Glassy":25,"Orbit":3,"Sand":5,"Lucky Potion":3},
+ "Star Potion":{"Supreme":1,"Super":5,"Lucky":77,"soul":500},
+ "Starlight Potion":{"Supreme":3,"Phantasm":1,"Super":10,"Lucky":777,"soul":1000,"Silent Night":2},
+ "Eternity Potion":{"Starlight Potion":1,"Rebellion":1,"Star Potion":2,"Fate":2,"Phantasm":10,"Silent Night":5},
+ "Omega Potion":{"Darkness":1,"Transe...":2,"Agni":3,"Hate":266,"Dread":2},
+ "Potion of Calamity":{"Omega Potion":2,"CalamityStar":2},
+ "Awakening Potion":{"Awakening":7,"Frozen":80000}
+};
+const potionNames=Object.keys(recipes);
+const allMaterials=[...new Set(Object.values(recipes).flatMap(r=>Object.keys(r)))].sort((a,b)=>a.localeCompare(b));
+const $=id=>document.getElementById(id);
+function fillSelect(el, includeAll=false){el.innerHTML=(includeAll?'<option value="">選択してください</option>':'')+potionNames.map(n=>`<option>${esc(n)}</option>`).join('');}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function nval(id,min=0){const n=Number($(id).value);return Number.isFinite(n)?Math.max(min,Math.floor(n)):min;}
+function addMap(target,source,mult=1){for(const [k,v] of Object.entries(source))target[k]=(target[k]||0)+v*mult;}
+function expandIngredients(potion,count,out={},stack=[]){
+ if(stack.includes(potion))throw new Error("レシピに循環参照があります: "+potion);
+ const rec=recipes[potion]; if(!rec){out[potion]=(out[potion]||0)+count;return out;}
+ for(const [mat,qty] of Object.entries(rec)){
+   if(recipes[mat]) expandIngredients(mat,count*qty,out,[...stack,potion]);
+   else out[mat]=(out[mat]||0)+count*qty;
+ }
+ return out;
+}
+function directIngredients(potion,count){const out={};addMap(out,recipes[potion],count);return out;}
+function fmt(n){return Number(n).toLocaleString('en-US');}
+function renderMap(map){const entries=Object.entries(map).filter(([,v])=>v>0).sort((a,b)=>a[0].localeCompare(b[0]));if(!entries.length)return `<p class="empty">${t('noMaterials')}</p>`;return `<table><thead><tr><th>${t('materialsCol')}</th><th>${t('amountCol')}</th></tr></thead><tbody>${entries.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${fmt(v)}</td></tr>`).join('')}</tbody></table>`;}
+function getRequiredPotionIngredients(potion,out=new Set(),seen=new Set()){
+ if(seen.has(potion)||!recipes[potion])return out;
+ seen.add(potion);
+ for(const mat of Object.keys(recipes[potion]))if(recipes[mat]){out.add(mat);getRequiredPotionIngredients(mat,out,seen);}
+ return out;
+}
+function buildOwnedPotionInputs(){
+ const potion=$('needPotion').value;
+ const names=[...getRequiredPotionIngredients(potion)].sort((a,b)=>a.localeCompare(b));
+ $('ownedPotionInputs').innerHTML=names.length?names.map(m=>`<div class="invrow"><label for="owned-${encodeURIComponent(m)}">${esc(m)}</label><input id="owned-${encodeURIComponent(m)}" data-owned-potion="${esc(m)}" type="number" min="0" step="1" placeholder="0" aria-label="${esc(m+t('ownedAria'))}"></div>`).join(''):`<p class="empty">${t('noOwnedPotions')}</p>`;
+}
+function readOwnedPotions(){const owned={};document.querySelectorAll('#ownedPotionInputs input[data-owned-potion]').forEach(el=>{const v=el.value.trim();owned[el.dataset.ownedPotion]=v===''?0:Math.max(0,Math.floor(Number(v)||0));});return owned;}
+function expandWithOwned(potion,count,owned,out={},usedPotions={},requiredPotions={},stack=[]){
+ if(stack.includes(potion))throw new Error('レシピに循環参照があります: '+potion);
+ const rec=recipes[potion];if(!rec){out[potion]=(out[potion]||0)+count;return out;}
+ for(const [mat,qty] of Object.entries(rec)){
+   const required=count*qty;
+   if(recipes[mat]){
+     requiredPotions[mat]=(requiredPotions[mat]||0)+required;
+     const have=owned[mat]||0;const used=Math.min(required,have);owned[mat]=have-used;
+     if(used>0)usedPotions[mat]=(usedPotions[mat]||0)+used;
+     if(required-used>0)expandWithOwned(mat,required-used,owned,out,usedPotions,requiredPotions,[...stack,potion]);
+   }else out[mat]=(out[mat]||0)+required;
+ }
+ return out;
+}
+function renderPotionUsage(required,used){
+ const rows=Object.entries(required).filter(([,v])=>v>0).sort((a,b)=>a[0].localeCompare(b[0]));
+ if(!rows.length)return `<p class="empty">${t('noIntermediate')}</p>`;
+ return `<table><thead><tr><th>${t('potionCol')}</th><th>${t('requiredCol')}</th><th>${t('ownedUsedCol')}</th></tr></thead><tbody>${rows.map(([name,qty])=>`<tr><td>${esc(name)}</td><td>${fmt(qty)}</td><td>${fmt(used[name]||0)}</td></tr>`).join('')}</tbody></table>`;
+}
+function calcNeed(){
+ const potion=$('needPotion').value,count=nval('needCount',1),expand=$('expandNeed').checked;
+ if(!potion){$('needResult').innerHTML=`<p class="empty">${t('choosePotion')}</p>`;return;}
+ const owned=readOwnedPotions();
+ let need, usedPotions={}, requiredPotions={};
+ if(expand)need=expandWithOwned(potion,count,{...owned},{},usedPotions,requiredPotions);
+ else {
+   need=directIngredients(potion,count);
+   for(const [mat,qty] of Object.entries(need))if(recipes[mat])requiredPotions[mat]=qty;
+   for(const [mat,have] of Object.entries(owned))if(need[mat]){const used=Math.min(need[mat],have);need[mat]=Math.max(0,need[mat]-used);if(used>0)usedPotions[mat]=used;}
+ }
+ $('needResult').innerHTML=`<div class="resultbox"><h3>${esc(potion)} × ${fmt(count)}</h3><span class="pill">${expand?t('expandedMode'):t('directMode')}</span><h3 style="margin-top:18px">${t('requiredMaterials')}</h3>${renderMap(need)}<h3 style="margin-top:18px">${t('intermediateUsage')}</h3>${renderPotionUsage(requiredPotions,usedPotions)}${Object.values(owned).some(v=>v>0)?`<p class="note">${t('ownedDeductNote')}</p>`:''}</div>`;
+}
+function getRelevantMaterials(potion, out=new Set(), seen=new Set()){
+ if(seen.has(potion)||!recipes[potion])return out;
+ seen.add(potion);
+ for(const mat of Object.keys(recipes[potion])){
+   out.add(mat);
+   if(recipes[mat])getRelevantMaterials(mat,out,seen);
+ }
+ return out;
+}
+function buildInventory(){
+ const previous={};document.querySelectorAll('#inventory input[data-material]').forEach(el=>previous[el.dataset.material]=el.value);
+ const potion=$('craftPotion').value;
+ const includeIntermediate=$('includeIntermediate').checked;
+ const materials=includeIntermediate?[...getRelevantMaterials(potion)]:Object.keys(recipes[potion]||{});
+ materials.sort((a,b)=>a.localeCompare(b));
+ $('inventory').innerHTML=materials.map(m=>`<div class="invrow"><label for="inv-${encodeURIComponent(m)}">${esc(m)}</label><input id="inv-${encodeURIComponent(m)}" data-material="${esc(m)}" type="number" min="0" step="1" placeholder="${t('unlimitedPlaceholder')}" aria-label="${esc(m+t('inventoryAria'))}"></div>`).join('')||`<p class="empty">${t('noMaterialsAvailable')}</p>`;
+ document.querySelectorAll('#inventory input[data-material]').forEach(el=>{if(previous[el.dataset.material]!==undefined)el.value=previous[el.dataset.material];});
+}
+function readStock(){
+ const stock={};
+ document.querySelectorAll('#inventory input[data-material]').forEach(el=>{
+   const raw=el.value.trim();stock[el.dataset.material]=raw===''?Infinity:Math.max(0,Math.floor(Number(raw)||0));
+ });
+ return stock;
+}
+function calculateConsumption(potion,count,stock,used={},stack=[],includeIntermediate=true){
+ if(stack.includes(potion))throw new Error('レシピに循環参照があります: '+potion);
+ const rec=recipes[potion];
+ if(!rec || (rec && !includeIntermediate)){
+   const have=stock[potion]===undefined?Infinity:stock[potion];
+   const take=Math.min(count,have);
+   if(take>0){used[potion]=(used[potion]||0)+take;if(Number.isFinite(stock[potion]))stock[potion]-=take;}
+   const deficit=count-take;
+   if(deficit>0)used['不足：'+potion]=(used['不足：'+potion]||0)+deficit;
+   return used;
+ }
+ const have=stock[potion]===undefined?Infinity:stock[potion];
+ const take=Math.min(count,have);
+ if(take>0){used[potion]=(used[potion]||0)+take;if(Number.isFinite(stock[potion]))stock[potion]-=take;}
+ const deficit=count-take;
+ if(deficit>0){
+   for(const [mat,qty] of Object.entries(rec))calculateConsumption(mat,deficit*qty,stock,used,[...stack,potion],includeIntermediate);
+ }
+ return used;
+}
+function attemptCraft(potion,count,original){
+ const stock={...original};const used={};
+ for(const [mat,qty] of Object.entries(recipes[potion]))calculateConsumption(mat,count*qty,stock,used,[potion],$('includeIntermediate').checked);
+ const feasible=!Object.keys(used).some(k=>k.startsWith('不足：'));
+ return {used,remaining:stock,feasible};
+}
+function calcCraft(){
+ const potion=$('craftPotion').value;
+ if(!potion)return;
+ const stock=readStock();
+ // 未入力は無制限。上限が見つからない場合は「制限なし」として扱う。
+ let lo=0,hi=1,cap=1e15;
+ while(hi<cap && attemptCraft(potion,hi,stock).feasible){lo=hi;hi=Math.min(cap,hi*2);}
+ let unbounded=false;
+ if(hi===cap && attemptCraft(potion,hi,stock).feasible)unbounded=true;
+ else {while(lo<hi){const mid=Math.ceil((lo+hi)/2);if(attemptCraft(potion,mid,stock).feasible)lo=mid;else hi=mid-1;}}
+ const possible=unbounded?null:lo;
+ const result=attemptCraft(potion,possible===null?1:possible,stock);
+ const used={...result.used};delete used['不足：'];
+ const usedRows=Object.entries(used).filter(([m,v])=>v>0);
+ const usedHtml=usedRows.length?renderMap(Object.fromEntries(usedRows)):`<p class="empty">${t('noUsage')}</p>`;
+ const remainHtml=Object.entries(stock).filter(([m,v])=>Number.isFinite(v)).length?renderMap(Object.fromEntries(Object.entries(stock).filter(([m,v])=>Number.isFinite(v)).map(([m,v])=>[m,Math.max(0,v-(result.used[m]||0))]))):`<p class="empty">${t('noEnteredStock')}</p>`;
+ $('craftResult').innerHTML=`<div class="resultbox"><h3>${t('craftable')}${possible===null?t('unlimited'):fmt(possible)+(currentLang==='ja'?' 個':'')}</h3><p class="muted">${t('craftExplain')}</p><h3 style="margin-top:18px">${t('usedMaterials')} ${possible===null?t('reference'):''}${currentLang==='ja'?'）':')'}</h3>${usedHtml}<h3 style="margin-top:18px">${t('remaining')}</h3>${remainHtml}</div>`;
+}
+function renderRecipes(filter=''){
+ const q=filter.trim().toLowerCase();
+ const names=potionNames.filter(n=>(n+' '+Object.keys(recipes[n]).join(' ')).toLowerCase().includes(q));
+ $('recipeList').innerHTML=names.map(n=>`<div class="resultbox recipe" data-name="${esc(n.toLowerCase())}"><h3>${esc(n)}</h3>${renderMap(recipes[n])}</div>`).join('')||`<p class="empty">${t('noRecipes')}</p>`;
+}
+fillSelect($('needPotion'));fillSelect($('craftPotion'));buildOwnedPotionInputs();buildInventory();renderRecipes();applyLanguage();
+$('needPotion').addEventListener('change',()=>{buildOwnedPotionInputs();$('needResult').innerHTML='';});
+$('craftPotion').addEventListener('change',()=>{buildInventory();$('craftResult').innerHTML='';});
+$('includeIntermediate').addEventListener('change',()=>{buildInventory();$('craftResult').innerHTML='';});
+$('langToggle').addEventListener('click',()=>{currentLang=currentLang==='ja'?'en':'ja';applyLanguage();});
+$('themeToggle').addEventListener('click',()=>{currentTheme=currentTheme==='dark'?'light':'dark';document.body.dataset.theme=currentTheme;applyLanguage();});
+$('colorSelect').addEventListener('change',e=>{document.body.dataset.color=e.target.value;});
+document.body.dataset.theme=currentTheme;document.body.dataset.color=$('colorSelect').value;
+$('calcNeed').addEventListener('click',calcNeed);$('calcCraft').addEventListener('click',calcCraft);
+$('recipeSearch').addEventListener('input',e=>renderRecipes(e.target.value));
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));
+ ['need','craft','recipes'].forEach(id=>$(id).classList.toggle('hidden',id!==btn.dataset.tab));
+}));
+calcNeed();
+</script>
+</body>
+</html>
